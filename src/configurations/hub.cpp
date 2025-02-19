@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <bluefruit.h>
 
+#include "datatypes.h"
+
 BLEClientBas clientBas; // battery client
 BLEClientDis clientDis; // Device information client
 BLEClientUart clientUart; // BLE UART client
@@ -133,12 +135,15 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
 {
     Serial.print("[RX]: ");
 
+    uint8_t buffer[sizeof(ImuData)];
     while (uart_svc.available())
     {
-        Serial.print((char) uart_svc.read());
+        uart_svc.read(buffer, uart_svc.available());
     }
 
-    Serial.println();
+    ImuData* result = reinterpret_cast<ImuData*>(buffer);
+
+    Serial.println(result->accelData.x);
 }
 
 void loop()

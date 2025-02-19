@@ -25,7 +25,6 @@ packed_struct Quaternion {
     double z;
 };
 
-
 /**
  * Euler angles orientation representation
  */

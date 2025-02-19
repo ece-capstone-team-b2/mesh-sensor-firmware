@@ -5,6 +5,8 @@
 #include <sstream>
 #include <string>
 
+#include "datatypes.h"
+
 // BLE Service
 BLEDfu  bledfu;  // OTA DFU service
 BLEDis  bledis;  // device information
@@ -82,33 +84,21 @@ void startAdvertising()
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds
 }
 
+Axis3d<double> a = { 1, 2, 3 };
+Quaternion q = { 1, 2, 3, 4 };
+EulerAngles e = { 1, 2, 3 };
+PositionData p = { a, q, e };
+
+ImuData data = { a, a, a, a, a, p, 7, 8, 9, 10 };
+
+char* bytes = (char*)&data;
+
 void loop()
 {
-  // Forward data from HW Serial to BLEUART
-  // while (Serial.available())
-  // {
-  //   // Delay to wait for enough input, since we have a limited transmission buffer
-  //   delay(2);
-  //
-  //   uint8_t buf[64];
-  //   int count = Serial.readBytes(buf, sizeof(buf));
-  //   bleuart.write( buf, count );
-  // }
+	char* transmit = bytes;
+	bleuart.write(transmit, sizeof(transmit));
 
-  auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-  auto msg = std::to_string(time.count());
-
-  bleuart.write(msg.c_str(), msg.size());
-
-  delay(500);
-
-  // Forward from BLE UART to HW Serial
-  // while ( bleuart.available() )
-  // {
-  //   uint8_t ch;
-  //   ch = (uint8_t) bleuart.read();
-  //   Serial.write(ch);
-  // }
+	delay(500);
 }
 
 // callback invoked when central connects
