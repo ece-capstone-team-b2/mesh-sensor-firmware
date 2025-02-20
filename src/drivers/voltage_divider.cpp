@@ -10,6 +10,15 @@ VoltageDivider::VoltageDivider(const uint32_t analogPin, const double dividerRes
         
     }
 
+VoltageDivider& VoltageDivider::operator=(const VoltageDivider &other) {
+    m_analogPin = other.m_analogPin;
+    m_dividerResistance = other.m_dividerResistance;
+    m_inputVoltage = other.m_inputVoltage;
+    m_adcMax = other.m_adcMax;
+}
+
+VoltageDivider::VoltageDivider(): m_analogPin{0}, m_dividerResistance{0}, m_inputVoltage{0}, m_adcMax{0} {}
+
 bool VoltageDivider::init() {
     pinMode(m_analogPin, INPUT);
     // Must match REFERENCE_VOLTAGE

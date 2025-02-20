@@ -80,4 +80,15 @@ packed_struct FlexData {
     VoltageDividerData flexData;
 };
 
+const constexpr uint8_t NUM_INSOLE_PRESSURE = 8;
+
+/**
+ * Insole sensor data
+ * 
+ * Has 8 internal voltage dividers
+ */
+packed_struct InsoleData {
+    VoltageDividerData insolePressures[NUM_INSOLE_PRESSURE];
+};
+
 #endif // SRC_DRIVERS_DATATYPES_H_

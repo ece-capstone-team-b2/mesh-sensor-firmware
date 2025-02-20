@@ -19,15 +19,19 @@ class VoltageDivider: public Sensor<VoltageDividerData>  {
      */
     VoltageDivider(const uint32_t analogPin, const double dividerResistance, const double inputVoltage, const uint32_t adcMax = 4095);
 
+    VoltageDivider& operator=(const VoltageDivider &);
+
+    VoltageDivider();
+
     virtual bool init() override;
 
     virtual void readData() override;
 
   private:
-    const uint32_t m_analogPin;
-    const double m_dividerResistance;
-    const double m_inputVoltage;
-    const uint32_t m_adcMax;
+    uint32_t m_analogPin;
+    double m_dividerResistance;
+    double m_inputVoltage;
+    uint32_t m_adcMax;
 };
 
 
