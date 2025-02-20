@@ -3,8 +3,10 @@
 #include <bluefruit.h>
 
 #include "bno055.h"
+#include "flex_sensor.h"
 
 BNO055 bno_imu{55, 0x28, &Wire, false};
+FlexSensor flex_sensor{A4, 39000, 3.0};
 
 void setup(void)
 {
@@ -12,13 +14,19 @@ void setup(void)
   while(!Serial) {}
   // Serial.println("hello");
   if (!bno_imu.init()) {
-    Serial.println("BNO055 failed to initialize");
+    // Serial.println("BNO055 failed to initialize");
   }
+  flex_sensor.init();
 }
 
 void loop() {
   bno_imu.readData();
-  Serial.write((uint8_t*)(&bno_imu.getData()), sizeof(bno_imu.getData()));
- // Serial.println("hellowe");
+  flex_sensor.readData();
+  auto data = flex_sensor.getData();
+  Serial.printf("Adc raw: %d\n", data.flexData.adcRawCount);
+  Serial.printf("calculatedResistance: %f\n", data.flexData.calculatedResistance);
+  Serial.printf("dividerResistance: %f\n", data.flexData.dividerResistance);
+  Serial.printf("inputVoltage: %f\n", data.flexData.inputVoltage);
+  Serial.printf("outputVoltage: %f\n", data.flexData.outputVoltage);
   delay(100);
 }

@@ -4,6 +4,8 @@
 #include <inttypes.h>
 #include <tuple>
 
+#include "datatypes.h"
+
 /**
  * @brief Sensor base class
  * @tparam TSensorData The type of data exposed by the sensor

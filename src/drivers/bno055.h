@@ -4,7 +4,6 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 
-#include "datatypes.h"
 #include "sensor.h"
 
 

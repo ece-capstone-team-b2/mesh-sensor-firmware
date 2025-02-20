@@ -61,5 +61,23 @@ packed_struct ImuData {
     uint8_t magCalibration;
 };
 
+/** 
+ * Information reported by a voltage divider
+ */
+packed_struct VoltageDividerData {
+    uint32_t adcRawCount; // Raw ADC data
+    double inputVoltage; // Input voltage to volage divider
+    double dividerResistance; // Resistance of the known resistor value
+    double outputVoltage; // Output voltage, scaled raw counts
+    double calculatedResistance; // Calculated resistance of divided component
+};
+
+
+/**
+ * Flex sensor data
+ */
+packed_struct FlexData {
+    VoltageDividerData flexData;
+};
 
 #endif // SRC_DRIVERS_DATATYPES_H_
