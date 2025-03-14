@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include <bluefruit.h>
-#include <chrono>
 #include <iomanip>
-#include <sstream>
 #include <string>
 
 #include "datatypes.h"
@@ -91,12 +89,14 @@ PositionData p = { a, q, e };
 
 ImuData data = { a, a, a, a, a, p, 7, 8, 9, 10 };
 
-char* bytes = (char*)&data;
+char stringData[] = "testing";
+
+// uint8_t* transData = reinterpret_cast<uint8_t*>(&data);
+uint8_t* transData = reinterpret_cast<uint8_t*>(&stringData);
 
 void loop()
 {
-	char* transmit = bytes;
-	bleuart.write(transmit, sizeof(transmit));
+    bleuart.write(transData, sizeof(stringData));
 
 	delay(500);
 }

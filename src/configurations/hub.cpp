@@ -59,7 +59,8 @@ void scan_callback(ble_gap_evt_adv_report_t* report)
     else
     {
         // Scanner pauses after receiving a report; resume if connection isn't made
-        Serial.print("Connection wasn't made, resuming scan");
+        Serial.println("Connection wasn't made, resuming scan");
+        delay(1000);
         Bluefruit.Scanner.resume();
     }
 }
@@ -141,9 +142,9 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
         uart_svc.read(buffer, uart_svc.available());
     }
 
-    ImuData* result = reinterpret_cast<ImuData*>(buffer);
+    char* result = reinterpret_cast<char*>(buffer);
 
-    Serial.println(result->accelData.x);
+    Serial.println(result);
 }
 
 void loop()
@@ -171,5 +172,5 @@ void loop()
         Serial.println("Searching for device...");
     }
 
-    delay(1);
+    delay(1000);
 }
