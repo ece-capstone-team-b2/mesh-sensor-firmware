@@ -90,14 +90,20 @@ PositionData p = { a, q, e };
 ImuData data = { a, a, a, a, a, p, 7, 8, 9, 10 };
 
 char stringData[] = "testing";
+const size_t numBytes = 200;
+uint8_t transmitData[numBytes];
+
+
 
 // uint8_t* transData = reinterpret_cast<uint8_t*>(&data);
 uint8_t* transData = reinterpret_cast<uint8_t*>(&stringData);
 
 void loop()
 {
-    bleuart.write(transData, sizeof(stringData));
-
+    for (uint8_t i = 0; i < numBytes; ++i) {
+      transmitData[i] = i;
+    }
+    bleuart.write(transmitData, sizeof(transmitData));
 	delay(500);
 }
 

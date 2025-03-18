@@ -90,6 +90,7 @@ void connect_callback(uint16_t conn_handle)
             Serial.print("Model: ");
             Serial.println(buffer);
         }
+        Bluefruit.getMaxMtu(conn_handle);
 
         Serial.println();
     }
@@ -137,15 +138,20 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
     Serial.print("[RX]: ");
 
     uint8_t buffer[sizeof(ImuData)];
-    while (uart_svc.available())
+    size_t available = uart_svc.available();
+    if (available)
     {
-        uart_svc.read(buffer, uart_svc.available());
+        available = uart_svc.readBytes(buffer, 200);
     }
 
     char* result = reinterpret_cast<char*>(buffer);
-
-    Serial.println(result);
+    for (int i = 0; i < available; ++i) {
+        Serial.printf("%d, ", buffer[i]);
+    }
+    Serial.println();
 }
+
+uint8_t buffer[255];
 
 void loop()
 {
@@ -155,15 +161,15 @@ void loop()
         {
             // Discovered means in working state
             // Get Serial input and send to Peripheral
-            if (Serial.available())
+            size_t bytesAvailable = Serial.available();
+            if (bytesAvailable)
             {
                 Serial.println("Sending serial input to peripheral");
                 delay(2); // delay a bit for all characters to arrive
 
-                char str[20 + 1] = {0};
-                Serial.readBytes(str, 20);
+                Serial.readBytes(buffer, bytesAvailable);
 
-                clientUart.print(str);
+                clientUart.write(buffer, bytesAvailable);
             }
         }
     }
