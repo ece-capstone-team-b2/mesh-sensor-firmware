@@ -3,8 +3,9 @@
 #include <Arduino.h>
 #include <cstring>
 
-InsoleSensor::InsoleSensor(const double dividerResistance, const double inputVoltage, const std::array<uint8_t, NUM_INSOLE_PRESSURE> digitalPinMapping, const std::array<uint8_t, NUM_INSOLE_PRESSURE> analogPinMapping) {
+InsoleSensor::InsoleSensor(const double firstDividerResistance, const double secondDividerResistance,const double inputVoltage, const std::array<uint8_t, NUM_INSOLE_PRESSURE> digitalPinMapping, const std::array<uint8_t, NUM_INSOLE_PRESSURE> analogPinMapping) {
     for (uint8_t i = 0; i < NUM_INSOLE_PRESSURE; ++i) {
+        double dividerResistance = i < 6 ? firstDividerResistance : secondDividerResistance;
         VoltageDivider divider(analogPinMapping[i], dividerResistance, inputVoltage);
         m_voltageDividers[i] = divider;
     }
@@ -28,6 +29,7 @@ void InsoleSensor::readData() {
     for (uint8_t i = 0; i < NUM_INSOLE_PRESSURE; ++i) {
         pinMode(m_digitalPinMapping[i], OUTPUT);
         digitalWrite(m_digitalPinMapping[i], HIGH);
+        delay(10);
         m_voltageDividers[i].readData();
         std::memcpy(&m_sensorData.insolePressures[i], &m_voltageDividers[i].getData(), sizeof(m_sensorData.insolePressures[i]));
         pinMode(m_digitalPinMapping[i], INPUT);

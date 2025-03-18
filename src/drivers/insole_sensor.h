@@ -8,12 +8,13 @@ class InsoleSensor: public Sensor<InsoleData> {
   public:
     /**
      * @brief Construct an insole sensor object
-     * @param dividerResistance The resistor resistance in ohms used as the divider with each pressure sensor
+     * @param firstDividerResistance The resistor resistance in ohms used as the divider for the first 6 non-heel sensors
+     * @param secondDividerResistance The resistor resistance in ohms used as the divider for the 2 heel sensors
      * @param inputVoltage Input voltage to the divider
      * @param digitalPinMapping Mappings between pressure sensor number and digital pin to write to read from it
      * @param analogPinMapping Mapping between pressure sensor number and analog pin to read to receive data
      */
-    InsoleSensor(const double dividerResistance, const double inputVoltage, const std::array<uint8_t, NUM_INSOLE_PRESSURE> digitalPinMapping, const std::array<uint8_t, NUM_INSOLE_PRESSURE> analogPinMapping);
+    InsoleSensor(const double firstDividerResistance, const double secondDividerResistance, const double inputVoltage, const std::array<uint8_t, NUM_INSOLE_PRESSURE> digitalPinMapping, const std::array<uint8_t, NUM_INSOLE_PRESSURE> analogPinMapping);
 
     virtual bool init() override;
 
