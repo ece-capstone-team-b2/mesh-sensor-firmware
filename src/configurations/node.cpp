@@ -4,6 +4,7 @@
 #include <string>
 
 #include "datatypes.h"
+#include "crc.h"
 
 // BLE Service
 BLEDfu  bledfu;  // OTA DFU service
@@ -89,21 +90,16 @@ PositionData p = { a, q, e };
 
 ImuData data = { a, a, a, a, a, p, 7, 8, 9, 10 };
 
-char stringData[] = "testing";
-const size_t numBytes = 200;
-uint8_t transmitData[numBytes];
+
+BlePacket<ImuData> packet {sizeof(BlePacket<ImuData>), PacketType::ImuPacket, 0, data, 0};
 
 
-
-// uint8_t* transData = reinterpret_cast<uint8_t*>(&data);
-uint8_t* transData = reinterpret_cast<uint8_t*>(&stringData);
 
 void loop()
 {
-    for (uint8_t i = 0; i < numBytes; ++i) {
-      transmitData[i] = i;
-    }
-    bleuart.write(transmitData, sizeof(transmitData));
+  uint16_t crc = crc16((uint8_t*)(&packet), sizeof(packet) - sizeof(uint16_t));
+  packet.crc = crc;
+  bleuart.write((uint8_t*)(&packet), sizeof(packet));
 	delay(500);
 }
 

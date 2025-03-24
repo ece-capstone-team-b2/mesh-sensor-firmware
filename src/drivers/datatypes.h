@@ -60,5 +60,24 @@ packed_struct ImuData {
     uint8_t magCalibration;
 };
 
+packed_struct InsoleData {
+    double forceData[8];
+};
+
+enum PacketType : uint8_t {
+    ImuPacket,
+    KneeFlex,
+    InsoleForce
+};
+
+template <typename PayloadData>
+packed_struct BlePacket {
+    uint8_t packetLength;
+    uint8_t packetType;
+    uint8_t transmitterId;
+    PayloadData payload;
+    uint16_t crc;
+};
+
 
 #endif // SRC_DRIVERS_DATATYPES_H_
