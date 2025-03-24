@@ -6,8 +6,6 @@
 
 #include "sensor.h"
 
-
-
 class BNO055: public Sensor<ImuData> {
   public:
     /**

@@ -25,7 +25,6 @@ packed_struct Quaternion {
     double z;
 };
 
-
 /**
  * Euler angles orientation representation
  */
@@ -90,5 +89,21 @@ const constexpr uint8_t NUM_INSOLE_PRESSURE = 8;
 packed_struct InsoleData {
     VoltageDividerData insolePressures[NUM_INSOLE_PRESSURE];
 };
+
+enum PacketType : uint8_t {
+    ImuPacket,
+    KneeFlex,
+    InsoleForce
+};
+
+template <typename PayloadData>
+packed_struct BlePacket {
+    uint8_t packetLength;
+    uint8_t packetType;
+    uint8_t transmitterId;
+    PayloadData payload;
+    uint16_t crc;
+};
+
 
 #endif // SRC_DRIVERS_DATATYPES_H_
