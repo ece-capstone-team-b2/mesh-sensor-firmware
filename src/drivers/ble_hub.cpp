@@ -56,7 +56,7 @@ std::optional<BlePacket<TPacketType>> parsePacket(const uint8_t* data, const uin
     using PacketType = BlePacket<TPacketType>;
     // Packet too short
     if ((packetLength) != sizeof(PacketType)) {
-        Serial.printf("Mismatched packet length: expected %d, received %d\n", sizeof(PacketType), packetLength);
+        // Serial.printf("Mismatched packet length: expected %d, received %d\n", sizeof(PacketType), packetLength);
         return std::nullopt;
     }
 
@@ -65,7 +65,7 @@ std::optional<BlePacket<TPacketType>> parsePacket(const uint8_t* data, const uin
     // Ignore crc bytes
     uint16_t calculated_crc = crc16(data, packetLength - sizeof(uint16_t));
     if (calculated_crc != parsedPacket->crc) {
-        Serial.println("Bad CRC!");
+        // Serial.println("Bad CRC!");
         return std::nullopt;
     }
 
@@ -75,7 +75,7 @@ std::optional<BlePacket<TPacketType>> parsePacket(const uint8_t* data, const uin
 
 
 void bluetooth_hub::init() {
-    Bluefruit.begin(4, 4);
+    Bluefruit.begin(0, 10);
     Bluefruit.setName("SWEAT Hub");
 
    
@@ -102,15 +102,11 @@ void bluetooth_hub::init() {
 }
 
 void bluetooth_hub::loop() {
-    if (Bluefruit.Central.connected())
-    {
-        Serial.printf("Connected to %d peripherals\n", connectionNum);
+    if (Bluefruit.Central.connected()) {
+        //Serial.printf("Connected to %d peripherals\n", connectionNum);
+    } else {
+        // Serial.println("Searching for device...");
     }
-    else
-    {
-        Serial.println("Searching for device...");
-    }
-    
 }
 
 
@@ -195,20 +191,38 @@ void bleuart_rx_callback(BLEClientUart& uart_svc)
                     auto packet = parsePacket<ImuData>((uint8_t*)(&handler.rxBuffer), handler.currentPacketLength);
                     if (packet.has_value()) {
                         auto payload = packet.value().payload;
-                        Serial.printf("IMU data from %d: Accel: %f %f %f\n", conn_handle, payload.accelData.x, payload.accelData.y,payload.accelData.z);
+                        Serial.write((uint8_t*)(&packet), sizeof(packet));
+                        // Serial.printf("%d: %.10f,%.10f,%.10f,%.10f\n", packet.value().transmitterId, payload.positionData.quatOrientation.w,  payload.positionData.quatOrientation.x,  payload.positionData.quatOrientation.y,  payload.positionData.quatOrientation.z);
                     }
                 } else if (packetType==PacketType::InsoleForce) {
                     auto packet = parsePacket<InsoleData>((uint8_t*)(&handler.rxBuffer), handler.currentPacketLength);
                     if (packet.has_value()) {
                         auto payload = packet.value().payload;
-                        Serial.printf("IMU data from %d: Accel: %f %f %f\n", conn_handle, payload.forceData[0]);
+
+                        Serial.write((uint8_t*)(&packet), sizeof(packet));
+                        // Serial.printf("Insole %d:", packet.value().transmitterId); 
+                        // for (int i = 0; i < NUM_INSOLE_PRESSURE; ++i) {
+                        //     Serial.printf("%d: %f", i, payload.insolePressures[i].calculatedResistance);
+                        // }
+                        // Serial.println();
+                    }
+                } else if (packetType == PacketType::KneeFlex) {
+                    auto packet = parsePacket<FlexData>((uint8_t*)(&handler.rxBuffer), handler.currentPacketLength);
+                    if (packet.has_value()) {
+                        auto payload = packet.value().payload;
+                        Serial.write((uint8_t*)(&packet), sizeof(packet));
+                        // Serial.printf("Flex %d: Resistance: %f \n", packet.value().transmitterId, payload.flexData.calculatedResistance);
                     }
                 }
                 handler.currentlyReceivingPacket = false;
             }
         } else {
+            uint32_t len = bleRxBuffer[i];
+            if (len != sizeof(BlePacket<ImuData>) && len != sizeof(BlePacket<InsoleData>) && len != sizeof(BlePacket<FlexData>)) {
+                continue;
+            }
             handler.currentlyReceivingPacket = true;
-            handler.currentPacketLength = bleRxBuffer[i];
+            handler.currentPacketLength = len;
             handler.currentBufferIndex = 0;
             handler.rxBuffer[handler.currentBufferIndex++] = bleRxBuffer[i];
             // Serial.printf("Starting new receive with packet length %d\n", handler.currentPacketLength);

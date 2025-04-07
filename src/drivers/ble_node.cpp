@@ -1,3 +1,4 @@
+#ifdef BLE_NODE
 #include <Arduino.h>
 #include <bluefruit.h>
 #include <iomanip>
@@ -5,26 +6,19 @@
 
 #include "datatypes.h"
 #include "crc.h"
+#include "ble_node.h"
 
-// BLE Service
-BLEDfu  bledfu;  // OTA DFU service
-BLEDis  bledis;  // device information
 BLEUart bleuart; // uart over ble
-BLEBas  blebas;  // battery
 
 void connect_callback(uint16_t conn_handle);
 void disconnect_callback(uint16_t conn_handle, uint8_t reason);
 void startAdvertising();
 
-void setup()
+void bluetooth_node::init()
 {
-  Serial.begin(115200);
 
   Serial.println("Starting BLE UART peripheral");
 
-  // Config the peripheral connection with maximum bandwidth
-  // more SRAM required by SoftDevice
-  // Note: All config***() function must be called before begin()
   Bluefruit.configPrphBandwidth(BANDWIDTH_MAX);
 
   Bluefruit.begin();
@@ -33,26 +27,12 @@ void setup()
   Bluefruit.Periph.setConnectCallback(connect_callback);
   Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
 
-  // To be consistent OTA DFU should be added first if it exists
-  bledfu.begin();
-
-  // Configure and Start Device Information Service
-  bledis.setManufacturer("Adafruit Industries");
-  bledis.setModel("Bluefruit Feather52");
-  bledis.begin();
 
   // Configure and Start BLE Uart Service
   bleuart.begin();
 
-  // Start BLE Battery Service
-  blebas.begin();
-  blebas.write(100);
-
   // Set up and start advertising
   startAdvertising();
-
-  Serial.println("Please use Adafruit's Bluefruit LE app to connect in UART mode");
-  Serial.println("Once connected, enter character(s) that you wish to send");
 }
 
 void startAdvertising()
@@ -83,25 +63,18 @@ void startAdvertising()
   Bluefruit.Advertising.start(0);                // 0 = Don't stop advertising after n seconds
 }
 
-Axis3d<double> a = { 1, 2, 3 };
-Quaternion q = { 1, 2, 3, 4 };
-EulerAngles e = { 1, 2, 3 };
-PositionData p = { a, q, e };
-
-ImuData data = { a, a, a, a, a, p, 7, 8, 9, 10 };
-
-
-BlePacket<ImuData> packet {sizeof(BlePacket<ImuData>), PacketType::ImuPacket, 0, data, 0};
-
-
-
-void loop()
-{
-  uint16_t crc = crc16((uint8_t*)(&packet), sizeof(packet) - sizeof(uint16_t));
-  packet.crc = crc;
-  bleuart.write((uint8_t*)(&packet), sizeof(packet));
-	delay(500);
+template <typename TDataType>
+void bluetooth_node::transmit(BlePacket<TDataType>& packet) {
+    size_t len = sizeof(packet);
+    uint8_t* data = (uint8_t*)(&packet);
+    uint16_t crc = crc16(data, len - sizeof(uint16_t));
+    packet.crc = crc;
+    bleuart.write(data, len);
 }
+
+template void bluetooth_node::transmit<ImuData>(BlePacket<ImuData>& packet);
+template void bluetooth_node::transmit<FlexData>(BlePacket<FlexData>& packet);
+template void bluetooth_node::transmit<InsoleData>(BlePacket<InsoleData>& packet);
 
 // callback invoked when central connects
 void connect_callback(uint16_t conn_handle)
@@ -129,3 +102,4 @@ void disconnect_callback(uint16_t conn_handle, uint8_t reason)
   Serial.println();
   Serial.print("Disconnected, reason = 0x"); Serial.println(reason, HEX);
 }
+#endif // BLE_NODE

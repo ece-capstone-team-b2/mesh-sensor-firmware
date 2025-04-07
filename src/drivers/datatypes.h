@@ -65,8 +65,6 @@ packed_struct ImuData {
  */
 packed_struct VoltageDividerData {
     uint32_t adcRawCount; // Raw ADC data
-    double inputVoltage; // Input voltage to volage divider
-    double dividerResistance; // Resistance of the known resistor value
     double outputVoltage; // Output voltage, scaled raw counts
     double calculatedResistance; // Calculated resistance of divided component
 };

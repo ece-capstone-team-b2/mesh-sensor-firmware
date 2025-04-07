@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <cstring>
 
-InsoleSensor::InsoleSensor(const double firstDividerResistance, const double secondDividerResistance,const double inputVoltage, const std::array<uint8_t, NUM_INSOLE_PRESSURE> digitalPinMapping, const std::array<uint8_t, NUM_INSOLE_PRESSURE> analogPinMapping) {
+InsoleSensor::InsoleSensor(const double firstDividerResistance, const double secondDividerResistance, const double inputVoltage, const std::array<uint8_t, NUM_INSOLE_PRESSURE> digitalPinMapping, const std::array<uint8_t, NUM_INSOLE_PRESSURE> analogPinMapping) {
     for (uint8_t i = 0; i < NUM_INSOLE_PRESSURE; ++i) {
         double dividerResistance = i < 6 ? firstDividerResistance : secondDividerResistance;
         VoltageDivider divider(analogPinMapping[i], dividerResistance, inputVoltage);

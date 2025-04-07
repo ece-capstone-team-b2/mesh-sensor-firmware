@@ -36,7 +36,5 @@ void VoltageDivider::readData() {
 
     m_sensorData.adcRawCount = rawValue;
     m_sensorData.calculatedResistance = readResistance;
-    m_sensorData.dividerResistance = m_dividerResistance;
-    m_sensorData.inputVoltage = m_inputVoltage;
     m_sensorData.outputVoltage = readVoltage;
 }

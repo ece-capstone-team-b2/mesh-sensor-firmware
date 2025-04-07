@@ -11,6 +11,8 @@
 void setup()
 {
     Serial.begin(115200);
+
+    
     bluetooth_hub::init();
     
 }
@@ -19,5 +21,5 @@ void loop()
 {
     bluetooth_hub::loop();
 
-    delay(1000);
+    delay(1);
 }
